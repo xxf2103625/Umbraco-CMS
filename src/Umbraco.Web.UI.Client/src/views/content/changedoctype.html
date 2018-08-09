@@ -1,0 +1,78 @@
+<div ng-controller="Umbraco.Editors.Content.ChangeDocTypeController as vm" ng-cloak>
+
+    <div class="umb-dialog-body with-footer">    
+        <div class="umb-pane">
+            
+            <umb-load-indicator ng-show="vm.loading"></umb-load-indicator>
+
+            <div ng-if="!vm.loading">
+                <div ng-if="vm.contentTypes">
+                    <p class="help"><localize key="changeDocType_changeDocTypeInstruction"></localize></p>
+
+                    <div class="umb-el-wrap">
+                        <label class="control-label"><localize key="changeDocType_selectedContent"></localize></label>
+                        <div class="controls controls-row">{{ vm.currentNodeName }}</div>
+                    </div>
+                
+                    <div class="umb-el-wrap">
+                        <label class="control-label"><localize key="changeDocType_currentType"></localize></label>
+                        <div class="controls controls-row">{{ vm.currentContentType.Name }}</div>
+                    </div>
+                    
+                    <!-- Available Doctypes to switch to -->
+                    <div class="umb-el-wrap">
+                        <label class="control-label"><localize key="changeDocType_newType"></localize></label>
+                        <div class="controls controls-row">
+                            <select>
+                                <option>Doctype Name</option>
+                                <option>Other Name</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Available Templates to switch to -->
+                    <div class="umb-el-wrap">
+                        <label class="control-label"><localize key="changeDocType_newTemplate"></localize></label>
+                        <div class="controls controls-row">
+                            <select>
+                                <option>Doctype Name</option>
+                                <option>Other Name</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Field Mapping -->
+                    <localize key="changeDocType_mapProperties"></localize>
+                    
+                    List properties and dropdowns
+                </div>               
+
+                <!-- Display warning if no types available to swap to -->
+                <umb-empty-state ng-if="!vm.contentTypes" position="center">
+                    <localize key="changeDocType_docTypeCannotBeChanged"></localize>
+                </umb-empty-state>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+        <umb-button
+            type="button"
+            button-style="link"
+            action="nav.hideDialog()"
+            label-key="general_cancel">
+        </umb-button>
+
+        <umb-button
+            ng-if="vm.contentTypes"
+            type="button" 
+            action="vm.save()"
+            state="vm.saveButtonState"
+            button-style="success"
+            label-key="buttons_save">
+        </umb-button>
+    </div>
+
+</div>

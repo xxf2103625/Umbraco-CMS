@@ -1539,5 +1539,138 @@ namespace Umbraco.Web.Editors
             Services.NotificationService.SetNotifications(Security.CurrentUser, content, notifyOptions);
         }
 
+        [HttpGet]
+        public AvailableContentTypes GetAvailableContentTypesToChangeTo(int currentNodeId)
+        {
+            var content = Services.ContentService.GetById(currentNodeId);
+
+            // Start with all content types
+            var contentTypes = Services.ContentTypeService.GetAll().ToArray();
+
+            //Remove invalid ones from list of potential alternatives
+            //Remove CurrentDoctype
+            contentTypes = contentTypes.Where(x => x.Id != content.ContentTypeId).ToArray();
+
+            //Remove Invalid Parent Doctypes
+            if (content.ParentId == -1)
+            {
+                // Root content, only include those that have been selected as allowed at root
+                contentTypes = contentTypes.Where(x => x.AllowedAsRoot).ToArray();
+            }
+            else
+            {
+                // Below root, so only include those allowed as sub-nodes for the parent
+                var parentNode = Services.ContentService.GetById(content.ParentId);
+
+                contentTypes = contentTypes
+                    .Where(x => parentNode.ContentType.AllowedContentTypes
+                        .Select(y => y.Id.Value)
+                        .Contains(x.Id)).ToArray();
+            }
+
+            //Remove invalid children doctypes
+            var docTypeIdsOfChildren = content.Children(Services.ContentService)
+                .Select(x => x.ContentType.Id)
+                .Distinct()
+                .ToList();
+
+            contentTypes = contentTypes
+                .Where(x => x.AllowedContentTypes
+                    .Select(y => y.Id.Value)
+                    .ContainsAll(docTypeIdsOfChildren)).ToArray();
+
+            return new AvailableContentTypes
+            {
+                ContentTypes = contentTypes,
+                CurrentNodeName = content.Name,
+                CurrentContentType = content.ContentType
+            };
+        }
+
+        /*
+            {
+              "contentNodeId": 1234,
+              "newContentTypeId": 80,
+              "newTemplateId": 40,
+              "fieldMap": [
+                {
+                  "fromAlias": "siteTitle",
+                  "toAlias": "newsTitle"
+                },
+                {
+                  "fromAlias": "bodyText",
+                  "toAlias": null
+                }
+              ]
+            }
+         */
+        [HttpPost]
+        public HttpResponseMessage PostContentTypeChange(ChangeContentType model)
+        {
+            var content = Services.ContentService.GetById(model.ContentNodeId);
+            if (content == null)
+            {
+                //throw some ex
+                return Request.CreateNotificationValidationErrorResponse("Content is null");
+            }
+
+            //Check that field mappings (do not have something selected twice & is unique)
+            if (model.FieldMap.GroupBy(x => x.ToAlias).Any(g => g.Count() > 1))
+            {
+                //Throw Error
+                return Request.CreateNotificationValidationErrorResponse(Services.TextService.Localize("changeDocType/validationErrorPropertyWithMoreThanOneMapping"));
+            }
+            
+            // For all properties to be mapped, save the current values to a temporary list
+            var propertyMappings = new List<FieldMapValue>();
+            foreach (var map in model.FieldMap)
+            {
+                //If the ToAlias is not empty
+                if (!string.IsNullOrEmpty(map.ToAlias))
+                {
+                    // Mapping property, get current property value from alias
+                    var sourceAlias = map.FromAlias;
+                    var sourcePropertyValue = content.GetValue(sourceAlias);
+
+                    // Add to list
+                    propertyMappings.Add(new FieldMapValue
+                    {
+                        ToAlias = map.ToAlias,
+                        CurrentValue = sourcePropertyValue
+                    });
+                }
+            }
+
+            // Get flag for if content already published
+            var wasPublished = content.Published;
+
+            // Change the document type passing flag to clear the properties
+            var newContentType = Services.ContentTypeService.Get(model.NewContentTypeId);
+            content.ChangeContentType(newContentType, true);
+
+            //Set the template if one has been selected
+            content.Template = model.NewTemplateId > 0 ? Services.FileService.GetTemplate(model.NewTemplateId) : null;
+            
+            // Port across the property values to the new properties
+            foreach (var propertyMapping in propertyMappings)
+            {
+                content.SetValue(propertyMapping.ToAlias, propertyMapping.CurrentValue);
+            }
+
+            // Save the changes
+            var user = Security.CurrentUser;
+            Services.ContentService.Save(content, user.Id);
+
+            // Publish if the content was already published
+            if (wasPublished)
+            {
+                // no values to publish, really
+                Services.ContentService.SaveAndPublish(content, userId: user.Id);
+            }
+
+            //All OK - return a 200
+            return Request.CreateNotificationSuccessResponse("DOCTYPE CHANGED");
+        }
+
     }
 }

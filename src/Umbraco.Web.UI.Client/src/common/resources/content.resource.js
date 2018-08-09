@@ -787,9 +787,68 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 ),
                 "Failed to create blueprint from content with id " + contentId
             );
+        },
+
+        /**
+          * @ngdoc method
+          * @name umbraco.resources.contentResource#getAvailableContentTypesToChangeTo
+          * @methodOf umbraco.resources.contentResource
+          *
+          * @description
+          * Returns a list of available content types that it can be changed by checking against a nodeID
+          *
+          * @param {Int} id id of content item to query for available ContentTypes to change to        
+          * @returns {Promise} resourcePromise object.
+          *
+          */
+         getAvailableContentTypesToChangeTo: function (id) {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "GetAvailableContentTypesToChangeTo",
+                        [{ currentNodeId: id }])),
+                'Failed to get available content types to change to for item ' + id);
+        },
+
+        /**
+          * @ngdoc method
+          * @name umbraco.resources.contentResource#postContentTypeChange
+          * @methodOf umbraco.resources.contentResource
+          *
+          * @description
+          * Sorts all children below a given parent node id, based on a collection of node-ids
+          *
+          * @param {Object} args arguments object
+          * @param {Int} args.contentNodeId the ID of the current node to change doctype
+          * @param {Int} args.newContentTypeId the ID of the pew ContentType to change to
+          * @param {Int} args.newTemplateId the ID of the new Template to change to
+          * @param {Array} args.fieldMap array of node IDs as they should be sorted
+          * @returns {Promise} resourcePromise object.
+          *
+          */
+         postContentTypeChange: function (args) {
+            if (!args) {
+                throw "args cannot be null";
+            }
+            if (!args.contentNodeId) {
+                throw "args.contentNodeId cannot be null";
+            }
+            if (!args.newContentTypeId) {
+                throw "args.newContentTypeId cannot be null";
+            }
+            if (!args.newTemplateId) {
+                throw "args.newTemplateId cannot be null";
+            }
+            if (!args.fieldMap) {
+                throw "args.fieldMap cannot be null";
+            }
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(umbRequestHelper.getApiUrl("contentApiBaseUrl", "PostContentTypeChange"),
+                    args),
+                'Failed to change content type content');
         }
-
-
     };
 }
 
