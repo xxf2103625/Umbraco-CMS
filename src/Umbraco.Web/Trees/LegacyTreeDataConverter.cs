@@ -211,46 +211,43 @@ namespace Umbraco.Web.Trees
                         new LegacyUrlAction(
                             "create.aspx?nodeId=" + nodeId + "&nodeType=" + nodeType + "&nodeName=" + nodeName + "&rnd=" + DateTime.UtcNow.Ticks,
                             Current.Services.TextService.Localize("actions/create")));
+
                 case "UmbClientMgr.appActions().actionNewFolder()":
                     return Attempt.Succeed(
                         new LegacyUrlAction(
                             "createFolder.aspx?nodeId=" + nodeId + "&nodeType=" + nodeType + "&nodeName=" + nodeName + "&rnd=" + DateTime.UtcNow.Ticks,
                             Current.Services.TextService.Localize("actions/create")));
+
                 case "UmbClientMgr.appActions().actionProtect()":
                     return Attempt.Succeed(
                         new LegacyUrlAction(
                             "dialogs/protectPage.aspx?mode=cut&nodeId=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
                             Current.Services.TextService.Localize("actions/protect")));
+
                 case "UmbClientMgr.appActions().actionRollback()":
                     return Attempt.Succeed(
                         new LegacyUrlAction(
                             "dialogs/rollback.aspx?nodeId=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
                             Current.Services.TextService.Localize("actions/rollback")));
-                case "UmbClientMgr.appActions().actionNotify()":
-                    return Attempt.Succeed(
-                        new LegacyUrlAction(
-                            "dialogs/notifications.aspx?id=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
-                            Current.Services.TextService.Localize("actions/notify")));
+
                 case "UmbClientMgr.appActions().actionPublish()":
                     return Attempt.Succeed(
                         new LegacyUrlAction(
                             "dialogs/publish.aspx?id=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
                             Current.Services.TextService.Localize("actions/publish")));
-                case "UmbClientMgr.appActions().actionChangeDocType()":
-                    return Attempt.Succeed(
-                        new LegacyUrlAction(
-                            "dialogs/ChangeDocType.aspx?id=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
-                            Current.Services.TextService.Localize("actions/changeDocType")));
+
                 case "UmbClientMgr.appActions().actionToPublish()":
                     return Attempt.Succeed(
                         new LegacyUrlAction(
                             "dialogs/SendPublish.aspx?id=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
                             Current.Services.TextService.Localize("actions/sendtopublish")));
+
                 case "UmbClientMgr.appActions().actionRePublish()":
                     return Attempt.Succeed(
                         new LegacyUrlAction(
                             "dialogs/republish.aspx?rnd=" + DateTime.UtcNow.Ticks,
                             Current.Services.TextService.Localize("actions/republish")));
+
                 case "UmbClientMgr.appActions().actionSendToTranslate()":
                     return Attempt.Succeed(
                         new LegacyUrlAction(
