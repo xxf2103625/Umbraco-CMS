@@ -6,7 +6,7 @@
         function link(scope, element, attrs, ctrl) {
 
             var evts = [];
-            var isInfoTab = false;
+            var isInfoApp = false;
             var labels = {};
             scope.publishStatus = [];
 
@@ -15,6 +15,11 @@
             scope.allowChangeTemplate = false;
             
             function onInit() {
+
+                //get the current variant
+                scope.activeVariant = _.find(scope.node.variants, function (variant) {
+                    return variant.active;
+                });
 
                 userService.getCurrentUser().then(function(user){
                         // only allow change of media type if user has access to the settings sections
@@ -42,7 +47,7 @@
                         labels.publishedPendingChanges = data[3];
                         labels.notCreated = data[4];
 
-                        setNodePublishStatus(scope.node);
+                        setPublishState(scope.node, scope.activeVariant);
 
                     });
 
@@ -172,49 +177,40 @@
                 });
             }
 
-            function setNodePublishStatus(node) {
+            function setPublishState(node, variant) {
 
-                // deleted node
-                if (node.trashed === true) {
-                    scope.publishStatus.push({
-                        label: labels.deleted,
-                        color: "danger"
-                    });
+                var state = {};
+
+                if (node.trashed) {
+                    // deleted node
+                    state.label = labels.deleted;
+                    state.color = "danger";
                     return;
                 }
 
-                if (node.variants) {
-                    for (var i = 0; i < node.variants.length; i++) {
-
-                        var variant = node.variants[i];
-
-                        var status = {
-                            culture: variant.language ? variant.language.culture : null
-                        };
-
-                        if (variant.state === "NotCreated") {
-                            status.label = labels.notCreated;
-                            status.color = "gray";
-                        }
-                        else if (variant.state === "Draft") {
-                            // draft node
-                            status.label = labels.unpublished;
-                            status.color = "gray";
-                        }
-                        else if (variant.state === "Published") {
-                            // published node
-                            status.label = labels.published;
-                            status.color = "success";
-                        }
-                        else if (variant.state === "PublishedPendingChanges") {
-                            // published node with pending changes
-                            status.label = labels.publishedPendingChanges;
-                            status.color = "success";
-                        }
-                        
-                        scope.publishStatus.push(status);
-                    }
+                if (variant.state === "NotCreated") {
+                    // not created variant
+                    state.label = labels.notCreated;
+                    state.color = "gray";
                 }
+                else if (variant.state === "Draft") {
+                    // draft variant
+                    state.label = labels.unpublished;
+                    state.color = "gray";
+                }
+                else if (variant.state === "Published") {
+                    // published variant
+                    state.label = labels.published;
+                    state.color = "success";
+                }
+                else if (variant.state === "PublishedPendingChanges") {
+                    // published variant with pending changes
+                    state.label = labels.publishedPendingChanges;
+                    state.color = "success";
+                }
+
+                scope.variantState = state;
+
             }
 
             function setPublishDate(date) {
@@ -312,19 +308,24 @@
             evts.push(eventsService.on("app.tabChange", function (event, args) {
                 $timeout(function(){
                     if (args.alias === "info") {
-                        isInfoTab = true;
+                        isInfoApp = true;
                         loadAuditTrail();
                     } else {
-                        isInfoTab = false;
+                        isInfoApp = false;
                     }
                 });
+            }));
+
+            // listen for variant change so we can update the content
+            evts.push(eventsService.on("editors.content.changeVariant", function (event, args) {
+                setPublishState(args.node, args.variant);
             }));
 
             // watch for content updates - reload content when node is saved, published etc.
             scope.$watch('node.updateDate', function(newValue, oldValue){
 
                 if(!newValue) { return; }
-                if(newValue === oldValue) { return; }             
+                if(newValue === oldValue) { return; }
                 
                 if(isInfoTab) {
                     loadAuditTrail();

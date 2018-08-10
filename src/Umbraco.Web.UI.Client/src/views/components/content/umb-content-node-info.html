@@ -169,12 +169,7 @@
             <umb-box-content class="block-form">
 
                 <umb-control-group data-element="node-info-status" label="@general_status">
-                    <div ng-repeat="status in publishStatus" style="margin-bottom: 5px;">
-                        <span ng-if="status.culture"><em>{{status.culture}}: </em></span>
-                        <umb-badge size="xs" color="{{status.color}}">
-                            {{status.label}}
-                        </umb-badge>
-                    </div>
+                    <umb-badge size="xs" color="{{variantState.color}}">{{variantState.label}}</umb-badge>
                 </umb-control-group>
 
                 <umb-control-group data-element="node-info-create-date" label="@template_createdDate">

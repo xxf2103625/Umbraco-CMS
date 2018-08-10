@@ -158,6 +158,10 @@
             });
             contentApp.viewModel = variant;
 
+            // emit variant change event so content apps can update content
+            var args = { "node": $scope.content, "variant": variant };
+            eventsService.emit("editors.content.changeVariant", args);
+
             return variant;
         }
 
