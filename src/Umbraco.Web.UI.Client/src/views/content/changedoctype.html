@@ -23,9 +23,11 @@
                     <div class="umb-el-wrap">
                         <label class="control-label"><localize key="changeDocType_newType"></localize></label>
                         <div class="controls controls-row">
-                            <select>
-                                <option>Doctype Name</option>
-                                <option>Other Name</option>
+                            <select 
+                                ng-change="vm.contentTypeChanged()"
+                                ng-options="option.Name for option in vm.contentTypes track by option.Id"
+                                ng-model="vm.newContentType">
+                                <option value="" selected="selected">Choose Content Type</option>
                             </select>
                         </div>
                     </div>
@@ -34,17 +36,32 @@
                     <div class="umb-el-wrap">
                         <label class="control-label"><localize key="changeDocType_newTemplate"></localize></label>
                         <div class="controls controls-row">
-                            <select>
-                                <option>Doctype Name</option>
-                                <option>Other Name</option>
-                            </select>
+                            <select 
+                                ng-options="option.Name for option in vm.selectedContentTypeTemplates track by option.Id"
+                                ng-model="vm.newTemplate">
+                                <option value="" selected="selected">Choose Template</option>
+                            </select>                           
                         </div>
                     </div>
 
-                    <!-- Field Mapping -->
-                    <localize key="changeDocType_mapProperties"></localize>
-                    
-                    List properties and dropdowns
+                    <pre>{{ vm.newContentProps | json }}</pre>                    
+
+                    <div ng-if="vm.newContentType">
+                        <!-- Field Mapping -->
+                        <localize key="changeDocType_mapProperties"></localize>
+
+                        <div ng-repeat="currentProp in vm.currentContentProps">
+                            <label class="control-label">{{ currentProp.Name }}</label>
+                            
+                            <select 
+                                ng-options="option.Name for option in vm.newContentProps track by option.Id"
+                                ng-change="vm.propertyChanged(currentProp, )">
+                                <option value="" selected="selected">Choose New Property</option>
+                            </select>
+
+                        </div>
+                    </div>
+
                 </div>               
 
                 <!-- Display warning if no types available to swap to -->
