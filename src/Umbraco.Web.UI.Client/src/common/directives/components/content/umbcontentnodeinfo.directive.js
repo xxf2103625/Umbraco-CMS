@@ -288,7 +288,7 @@
             function formatDatesToLocal() {
                 // get current backoffice user and format dates
                 userService.getCurrentUser().then(function (currentUser) {
-                    scope.node.createDateFormatted = dateHelper.getLocalDate(scope.node.createDate, currentUser.locale, 'LLL');
+                    scope.activeVariant.createDateFormatted = dateHelper.getLocalDate(scope.activeVariant.createDate, currentUser.locale, 'LLL');
                     
                     scope.node.releaseDateYear = scope.node.releaseDate ? ucfirst(dateHelper.getLocalDate(scope.node.releaseDate, currentUser.locale, 'YYYY')) : null;
                     scope.node.releaseDateMonth = scope.node.releaseDate ? ucfirst(dateHelper.getLocalDate(scope.node.releaseDate, currentUser.locale, 'MMMM')) : null;
@@ -319,6 +319,7 @@
             // listen for variant change so we can update the content
             evts.push(eventsService.on("editors.content.changeVariant", function (event, args) {
                 setPublishState(args.node, args.variant);
+                formatDatesToLocal();
             }));
 
             // watch for content updates - reload content when node is saved, published etc.
@@ -330,7 +331,7 @@
                 if(isInfoTab) {
                     loadAuditTrail();
                     formatDatesToLocal();
-                    setNodePublishStatus(scope.node);
+                    setPublishState(scope.node);
                 }
             });
 
