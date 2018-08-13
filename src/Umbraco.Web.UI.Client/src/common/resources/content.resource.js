@@ -813,6 +813,29 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
         /**
           * @ngdoc method
+          * @name umbraco.resources.contentResource#getAvailableProperties
+          * @methodOf umbraco.resources.contentResource
+          *
+          * @description
+          * Returns a list of available properties that a content types that it can be changed to
+          *
+          * @param {String} fromAlias alias of current ContentType       
+          * @param {String} toAlias alias of new ContentType changing to
+          * @returns {Promise} resourcePromise object.
+          *
+          */
+         getAvailableProperties: function (fromAlias, toAlias) {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "GetAvailableProperties",
+                        [{ fromPropertyAlias: fromAlias,  toPropertyAlias: toAlias }])),
+                'Failed to get available content types to change to for item ' + id);
+        },
+
+        /**
+          * @ngdoc method
           * @name umbraco.resources.contentResource#postContentTypeChange
           * @methodOf umbraco.resources.contentResource
           *
