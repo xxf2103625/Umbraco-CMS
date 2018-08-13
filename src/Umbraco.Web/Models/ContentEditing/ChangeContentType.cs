@@ -44,17 +44,17 @@ namespace Umbraco.Web.Models.ContentEditing
         public string CurrentNodeName { get; set; }
 
         [DataMember(Name = "currentContentType")]
-        public IContentType CurrentContentType { get; set; }
+        public ContentTypeBasic CurrentContentType { get; set; }
 
         [DataMember(Name = "contentTypes")]
-        public IEnumerable<IContentType> ContentTypes { get; set; }
+        public IEnumerable<ContentTypeBasic> ContentTypes { get; set; }
     }
 
     [DataContract(Name = "availableProperties", Namespace = "")]
     public class AvailableProperties
     {
         [DataMember(Name = "templates")]
-        public IEnumerable<ITemplate> Templates { get; set; }
+        public IEnumerable<TemplateDisplay> Templates { get; set; }
 
         [DataMember(Name = "currentProperties")]
         public IEnumerable<CurrentProperty> CurrentProperties { get; set; }
@@ -73,11 +73,12 @@ namespace Umbraco.Web.Models.ContentEditing
         public IEnumerable<NewProperty> Allowed { get; set; }
     }
 
+    [DataContract(Name = "newProperty", Namespace = "")]
     public class NewProperty
     {
         [DataMember(Name = "name")]
         public string Name { get; set; }
-
+        
         [DataMember(Name = "alias")]
         public string Alias { get; set; }
     }

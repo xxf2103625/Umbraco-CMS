@@ -16,7 +16,7 @@
                 
                     <div class="umb-el-wrap" style="margin-bottom: 15px;">
                         <label class="control-label"><localize key="changeDocType_currentType"></localize></label>
-                        <div class="controls controls-row">{{ vm.currentContentType.Name }}</div>
+                        <div class="controls controls-row">{{ vm.currentContentType.name }}</div>
                     </div>
                     
                     <!-- Allowed Doctypes to switch to -->
@@ -25,7 +25,7 @@
                         <div class="controls controls-row">
                             <select 
                                 ng-change="vm.changeAllowedContentType(vm.newContentType)"
-                                ng-options="option.Name for option in vm.allowedContentTypes"
+                                ng-options="option.name for option in vm.allowedContentTypes"
                                 ng-model="vm.newContentType">
                             </select>
                         </div>
@@ -36,7 +36,7 @@
                         <label class="control-label"><localize key="changeDocType_newTemplate"></localize></label>
                         <div class="controls controls-row">
                             <select 
-                                ng-options="option.Name for option in vm.allowedTemplates"
+                                ng-options="option.name for option in vm.allowedTemplates"
                                 ng-model="vm.newTemplate">
                             </select>
                         </div>
@@ -58,7 +58,7 @@
                                 <td>
                                     <select 
                                         style="margin-bottom: 0;"
-                                        ng-options="option.Alias as option.Name for option in currentProperty.allowed"
+                                        ng-options="option.alias as option.name for option in currentProperty.allowed"
                                         ng-model="selected"
                                         ng-change="vm.changeProperty(currentProperty, selected)">
                                     </select>

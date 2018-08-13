@@ -1579,33 +1579,24 @@ namespace Umbraco.Web.Editors
                     .Select(y => y.Id.Value)
                     .ContainsAll(docTypeIdsOfChildren)).ToArray();
 
+            //Return a friendlier model down the wire
+            var basicContentTypes = new List<ContentTypeBasic>();
+            foreach (var type in contentTypes)
+            {
+                basicContentTypes.Add(Mapper.Map<IContentType, ContentTypeBasic>(type));
+            }
+
             return new AvailableContentTypes
             {
-                ContentTypes = contentTypes,
+                ContentTypes = basicContentTypes,
                 CurrentNodeName = content.Name,
-                CurrentContentType = content.ContentType
+                CurrentContentType =  Mapper.Map<IContentType, ContentTypeBasic>(content.ContentType)
             };
         }
 
         [HttpGet]
         public AvailableProperties GetAvailableProperties(string fromPropertyAlias, string toPropertyAlias)
         {
-            /*
-            "Templates": ["home", "something-else" ]
-            "CurrentProperties": [
-                "Name": "Date",
-                "Alias: "datePicker",
-                "Allowed": [
-                    {
-                        "Name": "Date",
-                        "Alias": "datePicker"
-                    },
-                    ...
-                ],
-                ...
-            ]            
-             */
-
             //Get the new property type we are changing to
             var newContentType = Services.ContentTypeService.Get(toPropertyAlias);
 
@@ -1641,9 +1632,15 @@ namespace Umbraco.Web.Editors
                 properties.Add(propertyToAdd);
             }
 
+            var templates = new List<TemplateDisplay>();
+            foreach (var template in newContentType.AllowedTemplates)
+            {
+                templates.Add(Mapper.Map<ITemplate, TemplateDisplay>(template));
+            }
+
             return new AvailableProperties
             {
-                Templates = newContentType.AllowedTemplates,
+                Templates = templates,
                 CurrentProperties = properties
             };
         }

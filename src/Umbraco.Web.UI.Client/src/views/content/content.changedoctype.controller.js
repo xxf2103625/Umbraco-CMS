@@ -31,7 +31,7 @@
 		}
 		
 		function changeAllowedContentType(newContentType) {
-			contentResource.getAvailableProperties(vm.currentContentType.Alias, newContentType.Alias)
+			contentResource.getAvailableProperties(vm.currentContentType.alias, newContentType.alias)
 				.then(function(data){
 					vm.allowedTemplates = data.templates;
 					vm.propertiesMap = data.currentProperties;
@@ -59,12 +59,14 @@
             
             var args = {
 				"contentNodeId": id,
-				"newContentTypeId": vm.newContentType.Id,
-				"newTemplateId": vm.newTemplate.Id,
+				"newContentTypeId": vm.newContentType.id,
+				"newTemplateId": vm.newTemplate.id,
 				"fieldMap": fieldMap
 			};
 
             contentResource.postContentTypeChange(args).then(function(){
+
+				console.log('args', args);
 				//Sync tree?
 				//Reload node?
 				vm.saveButtonState = "success";
