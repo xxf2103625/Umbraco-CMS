@@ -830,7 +830,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                     umbRequestHelper.getApiUrl(
                         "contentApiBaseUrl",
                         "GetAvailableProperties",
-                        [{ fromPropertyAlias: fromAlias,  toPropertyAlias: toAlias }])),
+                        [{ fromPropertyAlias: fromAlias},  { toPropertyAlias: toAlias }])),
                 'Failed to get available propeties for item ' + fromAlias);
         },
 
