@@ -1593,12 +1593,12 @@ namespace Umbraco.Web.Editors
             /*
             "Templates": ["home", "something-else" ]
             "CurrentProperties": [
-                "PropertyAlias": "datePicker",
-                "PropertyName: "Date",
+                "Name": "Date",
+                "Alias: "datePicker",
                 "Allowed": [
                     {
-                        "PropertyName": "Date",
-                        "PropertyAlias": "datePicker"
+                        "Name": "Date",
+                        "Alias": "datePicker"
                     },
                     ...
                 ],
@@ -1621,8 +1621,8 @@ namespace Umbraco.Web.Editors
             {
                 var propertyToAdd = new CurrentProperty
                 {
-                    PropertyName = currentProp.Name,
-                    PropertyAlias = currentProp.Alias
+                    Name = currentProp.Name,
+                    Alias = currentProp.Alias
                 };
 
                 var allowedProps = new List<NewProperty>();
@@ -1630,8 +1630,8 @@ namespace Umbraco.Web.Editors
                 {
                     var allowedProp = new NewProperty
                     {
-                        PropertyName = newProp.Name,
-                        PropertyAlias = newProp.Alias
+                        Name = newProp.Name,
+                        Alias = newProp.Alias
                     };
 
                     allowedProps.Add(allowedProp);

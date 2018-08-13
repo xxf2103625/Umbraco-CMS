@@ -63,11 +63,11 @@ namespace Umbraco.Web.Models.ContentEditing
     [DataContract(Name = "currentProperty", Namespace = "")]
     public class CurrentProperty
     {
-        [DataMember(Name = "propertyName")]
-        public string PropertyName { get; set; }
+        [DataMember(Name = "name")]
+        public string Name { get; set; }
 
-        [DataMember(Name = "propertyAlias")]
-        public string PropertyAlias { get; set; }
+        [DataMember(Name = "alias")]
+        public string Alias { get; set; }
 
         [DataMember(Name = "allowed")]
         public IEnumerable<NewProperty> Allowed { get; set; }
@@ -75,10 +75,10 @@ namespace Umbraco.Web.Models.ContentEditing
 
     public class NewProperty
     {
-        [DataMember(Name = "propertyName")]
-        public string PropertyName { get; set; }
+        [DataMember(Name = "name")]
+        public string Name { get; set; }
 
-        [DataMember(Name = "propertyAlias")]
-        public string PropertyAlias { get; set; }
+        [DataMember(Name = "alias")]
+        public string Alias { get; set; }
     }
 }

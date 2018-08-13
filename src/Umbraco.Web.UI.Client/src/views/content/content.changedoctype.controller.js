@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function ChangeDocTypeController($scope, $timeout, contentResource, navigationService) {
+    function ChangeDocTypeController($scope, contentResource, navigationService) {
 
         var vm = this;
         var id = $scope.currentNode.id;
@@ -17,100 +17,62 @@
 
 		// bind function to view model
 		vm.changeAllowedContentType = changeAllowedContentType;
+		vm.changeProperty = changeProperty;
         vm.save = save;
 
         function onInit() {
             vm.loading = true;
-            contentResource.getAvailableContentTypesToChangeTo(id).then(function(data){
-				
-				vm.currentContentType = data.CurrentContentType;				
-				vm.allowedContentTypes = data.ContentTypes;
-
-				vm.loading = false;
-			});
+			contentResource.getAvailableContentTypesToChangeTo(id)
+				.then(function(data){
+					vm.currentContentType = data.currentContentType;				
+					vm.allowedContentTypes = data.contentTypes;
+					vm.loading = false;
+				});
 		}
 		
 		function changeAllowedContentType(newContentType) {
-			console.log("change");
-
-			// use in request
-			console.log("current content type", vm.currentContentType.Alias);
-			console.log("new content type", newContentType.Alias);
-
 			contentResource.getAvailableProperties(vm.currentContentType.Alias, newContentType.Alias)
 				.then(function(data){
-					console.log(data);
+					vm.allowedTemplates = data.templates;
+					vm.propertiesMap = data.currentProperties;
 				});
+		}
 
-			/*
-			// fake request
-			$timeout(function(){
-
-				vm.allowedTemplates = [
-					{
-						"name": "Template Name 1",
-						"alias": "templateAlias",
-						"id": 1
-					},
-					{
-						"name": "Template Name 2",
-						"alias": "templateAlias2",
-						"id": 2
-					}
-				];
-
-				vm.propertiesMap = [
-					{
-						"name": "Date",
-						"alias": "datePicker",
-						"allowed": [
-							{
-								"name": "Release Date",
-								"alias": "datePicker"
-							},
-							{
-								"name": "Date",
-								"alias": "datePicker"
-							}
-						]
-					},
-					{
-						"name": "Headline",
-						"alias": "textString",
-						"allowed": [
-							{
-								"name": "Awesome Headline",
-								"alias": "textString"
-							}
-						]
-					}
-				];
-
-			}, 1000);
-			*/
-
+		function changeProperty(currentProperty, selected) {
+			currentProperty.selectedAlias = selected;
 		}
 
         function save() {
-            vm.saveButtonState = "busy";
+
+			vm.saveButtonState = "busy";
+
+			var fieldMap = [];
+
+			angular.forEach(vm.propertiesMap, function(property) {
+				if(property.selectedAlias) {
+					var map = {};
+					map.fromAlias = property.alias;
+					map.toAlias = property.selectedAlias;
+					fieldMap.push(map);
+				}
+			});
             
             var args = {
 				"contentNodeId": id,
 				"newContentTypeId": vm.newContentType.Id,
 				"newTemplateId": vm.newTemplate.Id,
-				"fieldMap": vm.fieldMap
-			  };
+				"fieldMap": fieldMap
+			};
 
             contentResource.postContentTypeChange(args).then(function(){
 				//Sync tree?
-
 				//Reload node?
-				
 				vm.saveButtonState = "success";
 			}, function(error) {
 				vm.error = error;
 				vm.saveButtonState = "error";
 			});
+
 		}
 		
         onInit();

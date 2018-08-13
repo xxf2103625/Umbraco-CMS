@@ -6,7 +6,7 @@
             <umb-load-indicator ng-show="vm.loading"></umb-load-indicator>
 
             <div ng-if="!vm.loading">
-                <div ng-if="vm.allowedContentTypes" class="block-form">
+                <div ng-if="vm.allowedContentTypes.length > 0" class="block-form">
                     <p class="help"><localize key="changeDocType_changeDocTypeInstruction"></localize></p>
 
                     <div class="umb-el-wrap" style="margin-bottom: 15px;">
@@ -25,7 +25,7 @@
                         <div class="controls controls-row">
                             <select 
                                 ng-change="vm.changeAllowedContentType(vm.newContentType)"
-                                ng-options="option.Name for option in vm.allowedContentTypes track by option.Id"
+                                ng-options="option.Name for option in vm.allowedContentTypes"
                                 ng-model="vm.newContentType">
                             </select>
                         </div>
@@ -36,7 +36,7 @@
                         <label class="control-label"><localize key="changeDocType_newTemplate"></localize></label>
                         <div class="controls controls-row">
                             <select 
-                                ng-options="option.name for option in vm.allowedTemplates"
+                                ng-options="option.Name for option in vm.allowedTemplates"
                                 ng-model="vm.newTemplate">
                             </select>
                         </div>
@@ -58,18 +58,18 @@
                                 <td>
                                     <select 
                                         style="margin-bottom: 0;"
-                                        ng-options="option.name for option in currentProperty.allowed"
-                                        ng-model="option.selected">
+                                        ng-options="option.Alias as option.Name for option in currentProperty.allowed"
+                                        ng-model="selected"
+                                        ng-change="vm.changeProperty(currentProperty, selected)">
                                     </select>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
-
                 </div>
 
                 <!-- Display warning if no types available to swap to -->
-                <umb-empty-state ng-if="!vm.allowedContentTypes" position="center">
+                <umb-empty-state ng-if="vm.allowedContentTypes.length === 0" position="center">
                     <localize key="changeDocType_docTypeCannotBeChanged"></localize>
                 </umb-empty-state>
 
@@ -85,9 +85,8 @@
             action="nav.hideDialog()"
             label-key="general_cancel">
         </umb-button>
-
         <umb-button
-            ng-if="vm.contentTypes"
+            ng-if="vm.allowedContentTypes.length > 0"
             type="button" 
             action="vm.save()"
             state="vm.saveButtonState"
