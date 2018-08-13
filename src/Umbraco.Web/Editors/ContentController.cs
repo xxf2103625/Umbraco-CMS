@@ -1587,6 +1587,67 @@ namespace Umbraco.Web.Editors
             };
         }
 
+        [HttpGet]
+        public AvailableProperties GetAvailableProperties(string fromPropertyAlias, string toPropertyAlias)
+        {
+            /*
+            "Templates": ["home", "something-else" ]
+            "CurrentProperties": [
+                "PropertyAlias": "datePicker",
+                "PropertyName: "Date",
+                "Allowed": [
+                    {
+                        "PropertyName": "Date",
+                        "PropertyAlias": "datePicker"
+                    },
+                    ...
+                ],
+                ...
+            ]            
+             */
+
+            //Get the new property type we are changing to
+            var newContentType = Services.ContentTypeService.Get(toPropertyAlias);
+
+            //Get the current property type that the content node is using
+            var currentContentType = Services.ContentTypeService.Get(fromPropertyAlias);
+
+            var properties = new List<CurrentProperty>();
+
+            //Create a list of current properties the current doctype has
+            //With each property in this list specifying what new properties from the doctype we are changing to
+            //Ensuring they use the same underlying property editor alias
+            foreach (var currentProp in currentContentType.PropertyTypes)
+            {
+                var propertyToAdd = new CurrentProperty
+                {
+                    PropertyName = currentProp.Name,
+                    PropertyAlias = currentProp.Alias
+                };
+
+                var allowedProps = new List<NewProperty>();
+                foreach (var newProp in newContentType.PropertyTypes.Where(x => x.PropertyEditorAlias == currentProp.PropertyEditorAlias))
+                {
+                    var allowedProp = new NewProperty
+                    {
+                        PropertyName = newProp.Name,
+                        PropertyAlias = newProp.Alias
+                    };
+
+                    allowedProps.Add(allowedProp);
+                }
+
+                propertyToAdd.Allowed = allowedProps;
+                properties.Add(propertyToAdd);
+            }
+
+            return new AvailableProperties
+            {
+                Templates = newContentType.AllowedTemplates,
+                CurrentProperties = properties
+            };
+        }
+
         /*
             {
               "contentNodeId": 1234,
