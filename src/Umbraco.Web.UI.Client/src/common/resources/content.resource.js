@@ -831,7 +831,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                         "contentApiBaseUrl",
                         "GetAvailableProperties",
                         [{ fromPropertyAlias: fromAlias,  toPropertyAlias: toAlias }])),
-                'Failed to get available content types to change to for item ' + id);
+                'Failed to get available propeties for item ' + fromAlias);
         },
 
         /**

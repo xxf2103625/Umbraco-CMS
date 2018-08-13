@@ -6,66 +6,70 @@
             <umb-load-indicator ng-show="vm.loading"></umb-load-indicator>
 
             <div ng-if="!vm.loading">
-                <div ng-if="vm.contentTypes">
+                <div ng-if="vm.allowedContentTypes" class="block-form">
                     <p class="help"><localize key="changeDocType_changeDocTypeInstruction"></localize></p>
 
-                    <div class="umb-el-wrap">
+                    <div class="umb-el-wrap" style="margin-bottom: 15px;">
                         <label class="control-label"><localize key="changeDocType_selectedContent"></localize></label>
-                        <div class="controls controls-row">{{ vm.currentNodeName }}</div>
+                        <div class="controls controls-row">{{ currentNode.name }}</div>
                     </div>
                 
-                    <div class="umb-el-wrap">
+                    <div class="umb-el-wrap" style="margin-bottom: 15px;">
                         <label class="control-label"><localize key="changeDocType_currentType"></localize></label>
                         <div class="controls controls-row">{{ vm.currentContentType.Name }}</div>
                     </div>
                     
-                    <!-- Available Doctypes to switch to -->
-                    <div class="umb-el-wrap">
+                    <!-- Allowed Doctypes to switch to -->
+                    <div class="umb-el-wrap" style="margin-bottom: 15px;">
                         <label class="control-label"><localize key="changeDocType_newType"></localize></label>
                         <div class="controls controls-row">
                             <select 
-                                ng-change="vm.contentTypeChanged()"
-                                ng-options="option.Name for option in vm.contentTypes track by option.Id"
+                                ng-change="vm.changeAllowedContentType(vm.newContentType)"
+                                ng-options="option.Name for option in vm.allowedContentTypes track by option.Id"
                                 ng-model="vm.newContentType">
-                                <option value="" selected="selected">Choose Content Type</option>
                             </select>
                         </div>
                     </div>
 
-                    <!-- Available Templates to switch to -->
-                    <div class="umb-el-wrap">
+                    <!-- Allowed Templates to switch to -->
+                    <div ng-if="vm.allowedTemplates.length > 0" class="umb-el-wrap" style="margin-bottom: 15px;">
                         <label class="control-label"><localize key="changeDocType_newTemplate"></localize></label>
                         <div class="controls controls-row">
                             <select 
-                                ng-options="option.Name for option in vm.selectedContentTypeTemplates track by option.Id"
+                                ng-options="option.name for option in vm.allowedTemplates"
                                 ng-model="vm.newTemplate">
-                                <option value="" selected="selected">Choose Template</option>
-                            </select>                           
-                        </div>
-                    </div>
-
-                    <pre>{{ vm.newContentProps | json }}</pre>                    
-
-                    <div ng-if="vm.newContentType">
-                        <!-- Field Mapping -->
-                        <localize key="changeDocType_mapProperties"></localize>
-
-                        <div ng-repeat="currentProp in vm.currentContentProps">
-                            <label class="control-label">{{ currentProp.Name }}</label>
-                            
-                            <select 
-                                ng-options="option.Name for option in vm.newContentProps track by option.Id"
-                                ng-change="vm.propertyChanged(currentProp, )">
-                                <option value="" selected="selected">Choose New Property</option>
                             </select>
-
                         </div>
                     </div>
 
-                </div>               
+                    <!-- Map properties -->
+                    <table class="table table-condensed table-bordered" ng-if="vm.propertiesMap.length > 0">
+                        <thead>
+                            <tr>
+                                <th>Current Property</th>
+                                <th>Map to Property</th>
+                            </th>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="currentProperty in vm.propertiesMap">
+                                <td>
+                                    <span class="bold">{{currentProperty.name}}</span>
+                                </td>
+                                <td>
+                                    <select 
+                                        style="margin-bottom: 0;"
+                                        ng-options="option.name for option in currentProperty.allowed"
+                                        ng-model="option.selected">
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
 
                 <!-- Display warning if no types available to swap to -->
-                <umb-empty-state ng-if="!vm.contentTypes" position="center">
+                <umb-empty-state ng-if="!vm.allowedContentTypes" position="center">
                     <localize key="changeDocType_docTypeCannotBeChanged"></localize>
                 </umb-empty-state>
 
