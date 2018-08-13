@@ -56,7 +56,9 @@
                                     <span class="bold">{{currentProperty.name}}</span>
                                 </td>
                                 <td>
-                                    <select 
+                                    <p ng-if="currentProperty.allowed.length === 0">None</p>
+                                    <select
+                                        ng-if="currentProperty.allowed.length > 0"
                                         style="margin-bottom: 0;"
                                         ng-options="option.alias as option.name for option in currentProperty.allowed"
                                         ng-model="selected"
