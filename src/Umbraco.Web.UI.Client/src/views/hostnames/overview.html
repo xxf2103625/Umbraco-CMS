@@ -1,0 +1,69 @@
+<div data-element="editor-hostnames" ng-controller="Umbraco.Editors.Hostnames.OverviewController as vm" class="clearfix">
+
+    <umb-editor-view footer="false">
+
+        <umb-editor-header
+            name="vm.page.name"
+            name-locked="true"
+            hide-icon="true"
+            hide-description="true"
+            hide-alias="true">
+        </umb-editor-header>
+
+        <umb-editor-container>
+            
+            <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+
+            <umb-editor-sub-header>
+
+                <umb-editor-sub-header-content-left>
+                    <umb-button
+                        button-style="success"
+                        type="button" 
+                        action="vm.addHostname()"
+                        label="Add hostname">
+                    </umb-button>
+                </umb-editor-sub-header-content-left>
+
+            </umb-editor-sub-header>
+            
+            <table class="table table-hover" ng-if="!vm.loading">
+                <thead>
+                    <tr>
+                        <th>Hostname</th>
+                        <th>Language</th>
+                        <th>Node</th>
+                    </th>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="hostname in vm.hostnames" ng-click="vm.editHostname(hostname)" style="cursor: pointer;">
+                        <td>
+                            <i class="icon-home" style="color: #BBBABF; margin-right: 5px;"></i>
+                            <span class="bold">{{ hostname.hostname }}</span>
+                        </td>
+                        <td>{{hostname.language}}</td>
+                        <td>
+                            <div>
+                                <i class="{{hostname.node.icon}}" style="opacity: 0.8; margin-right: 2px;"></i>
+                                <span>{{hostname.node.name}}</span>
+                            </div>
+                        </td>
+                        <td style="text-align: right;">
+                            <umb-button
+                                type="button"
+                                size="xxs"
+                                button-style="danger"
+                                state="hostname.deleteButtonState"
+                                action="vm.deleteHostname(hostname, $event)"
+                                label-key="general_delete">
+                            </umb-button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </umb-editor-container>
+
+    </umb-editor-view>
+
+</div>
