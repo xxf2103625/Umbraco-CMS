@@ -10,11 +10,10 @@ using ClientDependency.Core.CompositeFiles.Providers;
 using ClientDependency.Core.Config;
 using Semver;
 using Umbraco.Core.IO;
-using Umbraco.Web.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Runtime;
 
-namespace Umbraco.Web.JavaScript
+namespace Umbraco.Web.JavaScript.Cdf
 {
     /// <summary>
     /// A utility class for working with CDF config and cache files - use sparingly!
@@ -31,6 +30,12 @@ namespace Umbraco.Web.JavaScript
             _logger = logger;
             _runtimeMinifier = runtimeMinifier;
             _fileName = ioHelper.MapPath(string.Format("{0}/ClientDependency.config", Core.Constants.SystemDirectories.Config));
+        }
+
+        private string FileMapDefaultFolder
+        {
+            get => XmlFileMapper.FileMapDefaultFolder;
+            set => XmlFileMapper.FileMapDefaultFolder = value;
         }
 
         /// <summary>
@@ -111,9 +116,9 @@ namespace Umbraco.Web.JavaScript
 
             try
             {
-                var fullPath = _runtimeMinifier.FileMapDefaultFolder.StartsWith("~/")
-                    ? currentHttpContext.Server.MapPath(_runtimeMinifier.FileMapDefaultFolder)
-                    : _runtimeMinifier.FileMapDefaultFolder;
+                var fullPath = FileMapDefaultFolder.StartsWith("~/")
+                    ? currentHttpContext.Server.MapPath(FileMapDefaultFolder)
+                    : FileMapDefaultFolder;
                 if (fullPath != null)
                 {
                     cdfTempDirectories.Add(fullPath);

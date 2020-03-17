@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using ClientDependency.Core;
@@ -11,27 +9,36 @@ using ClientDependency.Core.CompositeFiles;
 using ClientDependency.Core.CompositeFiles.Providers;
 using ClientDependency.Core.Config;
 using Umbraco.Core.Assets;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Manifest;
 using Umbraco.Core.Runtime;
 
-namespace Umbraco.Web.JavaScript
+namespace Umbraco.Web.JavaScript.Cdf
 {
     public class ClientDependencyRuntimeMinifier : IRuntimeMinifier
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IIOHelper _ioHelper;
+        private readonly ILogger _logger;
+        private readonly IUmbracoVersion _umbracoVersion;
+        private readonly IManifestParser _manifestParser;
+        private readonly IGlobalSettings _globalSettings;
         private readonly HtmlHelper _htmlHelper;
-        private readonly HttpContextBase _httpContext;
 
-        public int Version => ClientDependencySettings.Instance.Version;
 
-        public string FileMapDefaultFolder
+        public string GetHashValue => ClientDependencySettings.Instance.Version.ToString();
+
+        public ClientDependencyRuntimeMinifier(IHttpContextAccessor httpContextAccessor, IIOHelper ioHelper, ILogger logger, IUmbracoVersion umbracoVersion, IManifestParser manifestParser, IGlobalSettings globalSettings)
         {
-            get => XmlFileMapper.FileMapDefaultFolder;
-            set => XmlFileMapper.FileMapDefaultFolder = value;
-        }
-
-        public ClientDependencyRuntimeMinifier()
-        {
+            _httpContextAccessor = httpContextAccessor;
+            _ioHelper = ioHelper;
+            _logger = logger;
+            _umbracoVersion = umbracoVersion;
+            _manifestParser = manifestParser;
+            _globalSettings = globalSettings;
             _htmlHelper = new HtmlHelper(new ViewContext(), new ViewPage());
-            //_httpContext = httpContext;
         }
 
         public string RequiresCss(string filePath, string pathNameAlias)
@@ -76,7 +83,7 @@ namespace Umbraco.Web.JavaScript
             }
 
             var renderer = ClientDependencySettings.Instance.MvcRendererCollection["Umbraco.DependencyPathRenderer"];
-            renderer.RegisterDependencies(dependencies, new HashSet<IClientDependencyPath>(), out var scripts, out var stylesheets, _httpContext);
+            renderer.RegisterDependencies(dependencies, new HashSet<IClientDependencyPath>(), out var scripts, out var stylesheets, _httpContextAccessor.HttpContext);
 
             var toParse = assetType == AssetType.Javascript ? scripts : stylesheets;
             return toParse.Split(new[] { DependencyPathRenderer.Delimiter }, StringSplitOptions.RemoveEmptyEntries);
@@ -88,6 +95,41 @@ namespace Umbraco.Web.JavaScript
             var jsMinifier = new JSMin();
 
             return jsMinifier.Minify(reader);
+        }
+
+        public void Reset()
+        {
+            // Update ClientDependency version
+            var clientDependencyConfig = new ClientDependencyConfiguration(_logger, _ioHelper, this);
+            var clientDependencyUpdated = clientDependencyConfig.UpdateVersionNumber(
+                _umbracoVersion.SemanticVersion, DateTime.UtcNow, "yyyyMMdd");
+            // Delete ClientDependency temp directories to make sure we get fresh caches
+            var clientDependencyTempFilesDeleted = clientDependencyConfig.ClearTempFiles(_httpContextAccessor.HttpContext);
+        }
+
+        public string GetScriptForBackOffice()
+        {
+            var initJs = new JsInitialization(_manifestParser, this);
+            var initCss = new CssInitialization(_manifestParser, this);
+
+            var httpContext = _httpContextAccessor.GetRequiredHttpContext();
+            var files = initJs.OptimizeBackOfficeScriptFiles(httpContext, JsInitialization.GetDefaultInitialization());
+            var result = JavaScriptHelper.GetJavascriptInitialization(httpContext, files, "umbraco", _globalSettings, _ioHelper);
+            result += initCss.GetStylesheetInitialization(httpContext);
+
+            return result;
+        }
+
+        public IEnumerable<string> GetAssetList()
+        {
+            var initJs = new JsInitialization(_manifestParser, this);
+            var initCss = new CssInitialization(_manifestParser, this);
+            var assets = new List<string>();
+            var httpContext = _httpContextAccessor.HttpContext;
+            assets.AddRange(initJs.OptimizeBackOfficeScriptFiles(httpContext, Enumerable.Empty<string>()));
+            assets.AddRange(initCss.GetStylesheetFiles(httpContext));
+
+            return assets;
         }
 
         private ClientDependencyType MapDependencyTypeValue(AssetType type)

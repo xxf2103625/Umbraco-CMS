@@ -11,6 +11,7 @@ using Umbraco.Core.Runtime;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
+using Umbraco.Web.JavaScript.Cdf;
 using Umbraco.Web.Models;
 using Umbraco.Web.Trees;
 
@@ -130,7 +131,7 @@ namespace Umbraco.Web
         public static IHtmlString AngularValueTinyMceAssets(this HtmlHelper html, IRuntimeMinifier runtimeMinifier)
         {
             var ctx = new HttpContextWrapper(HttpContext.Current);
-            var files = JsInitialization.OptimizeTinyMceScriptFiles(ctx, runtimeMinifier);
+            var files = JavaScriptHelper.OptimizeTinyMceScriptFiles(ctx, runtimeMinifier);
 
             var sb = new StringBuilder();
 

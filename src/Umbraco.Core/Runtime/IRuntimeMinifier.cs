@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Web;
+﻿using System.Collections.Generic;
 using Umbraco.Core.Assets;
 
 namespace Umbraco.Core.Runtime
 {
     public interface IRuntimeMinifier
     {
-        int Version { get; }
-        string FileMapDefaultFolder { get; set; }
+        string GetHashValue { get; }
 
         //return type HtmlHelper
         string RequiresCss(string filePath, string pathNameAlias);
@@ -26,5 +23,8 @@ namespace Umbraco.Core.Runtime
         IEnumerable<string> GetAssetPaths(AssetType assetType, List<IAssetFile> attributes);
 
         string Minify(string src);
+        void Reset();
+        string GetScriptForBackOffice();
+        IEnumerable<string> GetAssetList();
     }
 }

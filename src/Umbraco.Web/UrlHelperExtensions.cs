@@ -144,9 +144,9 @@ namespace Umbraco.Web
             {
                 return DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture).GenerateHash();
             }
-            
+
             var version = Current.RuntimeState.SemanticVersion.ToSemanticString();
-            return $"{version}.{Current.RuntimeMinifier.Version}".GenerateHash();
+            return $"{version}.{Current.RuntimeMinifier.GetHashValue}".GenerateHash();
         }
     }
 }

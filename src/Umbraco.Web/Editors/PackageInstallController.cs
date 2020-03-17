@@ -385,9 +385,7 @@ namespace Umbraco.Web.Editors
             zipFile.Delete();
 
             //bump cdf to be safe
-            var clientDependencyConfig = new ClientDependencyConfiguration(Logger, _ioHelper, _runtimeMinifier);
-            var clientDependencyUpdated = clientDependencyConfig.UpdateVersionNumber(
-                _umbracoVersion.SemanticVersion, DateTime.UtcNow, "yyyyMMdd");
+            _runtimeMinifier.Reset();
 
             var redirectUrl = "";
             if (!packageInfo.PackageView.IsNullOrWhiteSpace())
